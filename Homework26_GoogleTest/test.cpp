@@ -4,6 +4,15 @@
 #include"Tax.h"
 using::testing::Return;
 using::testing::AtLeast;
+class Person_mock : public Person_interface
+{
+public:
+	~Person_mock() override = default;
+	MOCK_METHOD(void, Set_salary, (double salary), (override));
+	MOCK_METHOD(double, Get_salary, (), (const,override));
+	MOCK_METHOD(void, Set_surname, (std::string surname), (override));
+	MOCK_METHOD(std::string, Get_surname, (), (const,override));
+};
 TEST(TestCaseName, TestName) {
 	EXPECT_EQ(1, 1);
 	EXPECT_TRUE(true);
@@ -76,6 +85,12 @@ TEST(Person_Test,Tax_check)
 	std::cout << "\t" << person.Get_surname() << " salary is " << person.Get_salary()
 			  <<"\n\tWithout tax " << person.Get_surname() << " salary is " << person.Get_salary() - Tax(&person,tax) << std::endl;
 	
+}
+TEST(Person_Test, mock_Tax_check)
+{
+	Person_mock per_mock;
+	EXPECT_CALL(per_mock,Get_salary()).Times(2).WillOnce(Return(500)).WillOnce(Return(500));
+	EXPECT_TRUE(per_mock.Get_salary() * 13 / 100 == Tax(&per_mock, 13));
 }
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);
